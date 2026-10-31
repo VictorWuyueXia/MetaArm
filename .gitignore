@@ -17,3 +17,7 @@ Thumbs.db
 data/
 checkpoints/
 results/
+
+# Exclude simulator logs and generated experiment outputs.
+MUJOCO_LOG.TXT
+runs/

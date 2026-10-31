@@ -1,0 +1,41 @@
+[build-system]
+requires = ["uv_build==0.13.6"]
+build-backend = "uv_build"
+
+[project]
+name = "metaarm"
+version = "0.1.0"
+description = "GPU MuJoCo experiments for learned motion bases on the Franka Research 3."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "mujoco==3.17.0",
+    "mujoco-warp==3.17.0",
+    "warp-lang==1.18.0",
+    "torch==2.11.0",
+    "numpy>=2.2,<3",
+    "mjviser==0.0.14",
+    "viser==1.1.1",
+    "scipy>=1.18,<1.19",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.14,<1"]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

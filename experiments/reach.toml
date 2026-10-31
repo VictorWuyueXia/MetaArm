@@ -1,0 +1,9 @@
+# Vary the world count, Cartesian targets, and reference motion duration.
+num_envs = 64
+motion_seconds = 3.0
+target_poses = [
+    [0.55449948, 0.0, 0.62450243, 0.0, 0.923898314, 0.382638086, 0.0],
+    [0.50, 0.12, 0.55, 0.0, 0.923898314, 0.382638086, 0.0],
+    [0.45, -0.15, 0.45, 0.0, 0.923898314, 0.382638086, 0.0],
+]
+
