@@ -1,0 +1,19 @@
+# Exclude local Python environments and generated caches.
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Keep credentials, editor state, and generated research artifacts local.
+.env
+.env.*
+.vscode/
+.idea/
+Thumbs.db
+data/
+checkpoints/
+results/
