@@ -95,6 +95,8 @@ The theoretical objective is to establish conditions under which the learned mot
 - [Training improvement study](docs/training_improvement_study.md): diagnosis, ten measured configurations, and full/fresh test results.
 - [GPU coefficient IK](docs/coefficient_ik.md): constrained solver, experiment controls, and matched held-out comparisons.
 - [Local workspace basis](docs/local_workspace.md): scoped position data, selected neural model, and volume-grid validation.
+- [Larger-workspace pose IK](docs/pose_ik_improvement.md): eighteen neural fits, cooperative coefficient charts, paired full-joint timing, and fresh-target audits.
+- [Analytical FR3 singularities](docs/fr3_pose_singularities.md): exact Jacobian rank-loss family and admissible workspace witness.
 - [Research brief](docs/research_brief.md): project scope, candidate formulation, proof objectives, and experiment questions.
 - [Developer instructions](AGENTS.md): coding discipline and planning requirements.
 - [Original handoff](docs/references/Reduced_Motion_Basis_IK_Developer_Handoff.md): supplied background reference, preserved unchanged.
@@ -103,7 +105,7 @@ The research brief follows the project owner's description. The original handoff
 
 ## Research status
 
-The locked GPU environment, pinned FR3 model, MuJoCo Warp simulation, reference full-joint IK, and experiment UI are implemented and numerically checked. General/planar kinematic data collection is implemented. GPU neural motion-basis training is implemented. GPU coefficient IK and the matched full-joint comparison are implemented and integrated into the UI; the trained fixed chart has limited finite-trajectory success. No hardware validation or finite workspace coverage result is claimed.
+The locked GPU environment, pinned FR3 model, MuJoCo Warp simulation, reference full-joint IK, and experiment UI are implemented and numerically checked. General/planar kinematic data collection is implemented. GPU neural motion-basis training is implemented. GPU coefficient IK and the matched full-joint comparison are implemented and integrated into the UI; the trained fixed chart has limited finite-trajectory success. Workspace studies report sampled coverage only; continuous workspace coverage and hardware validation remain unestablished.
 
 ## Inspiration
 

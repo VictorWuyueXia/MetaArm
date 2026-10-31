@@ -10,6 +10,7 @@ import torch
 import warp as wp
 
 from metaarm.basis import MotionBasis, TaskBasis
+from metaarm.pose_model import PoseChart
 
 CHECKPOINT = (
     Path(__file__).resolve().parents[2] / "checkpoints/basis_20261031T105751490589Z_audited.pt"
@@ -105,6 +106,10 @@ class CoefficientIK:
         specification = saved["metadata"]["specification"]["model"]
         if outputs == 84 and len(weights) == 3:
             self.network = MotionBasis(self.bounds, specification).cuda()
+        elif outputs == 12:
+            self.network = PoseChart(
+                self.bounds, specification["width"], specification["side"]
+            ).cuda()
         elif outputs in (21, 42):
             task = "position" if outputs == 21 else "pose"
             self.network = TaskBasis(self.bounds, specification, task, len(weights) - 1).cuda()
@@ -115,23 +120,25 @@ class CoefficientIK:
         if not torch.allclose(self.network.joint_limits.double(), self.bounds, atol=1e-6, rtol=0):
             raise ValueError("Checkpoint and robot joint limits differ.")
 
-    def geometry(self, q):
+    def geometry(self, q, differentiate=True):
         """Evaluate tool FK and its base-aligned revolute-joint geometric Jacobian."""
         if q.shape != (self.num_envs, 7) or q.device.type != "cuda":
             raise ValueError("Kinematics requires a matching CUDA configuration batch.")
         self.qpos[:, self.q_slice].copy_(q)
         mjw.kinematics(self.gpu_model, self.data)
         position, rotation = self.position.double(), self.rotation.double()
+        if not differentiate:
+            return position, rotation, None
         axis, anchor = self.axis[:, self.joints].double(), self.anchor[:, self.joints].double()
         linear = torch.linalg.cross(axis, position[:, None] - anchor, dim=-1).mT
         jacobian = torch.cat((linear, axis.mT), dim=1)
         return position, rotation, jacobian
 
-    def residual(self, q, target, task):
+    def residual(self, q, target, task, differentiate=True):
         """Differentiate position and the principal body rotation logarithm exactly."""
-        position, rotation, jacobian = self.geometry(q)
+        position, rotation, jacobian = self.geometry(q, differentiate)
         error = (position - target["position"]) / POSITION_TOLERANCE
-        derivative = jacobian[:, :3] / POSITION_TOLERANCE
+        derivative = jacobian[:, :3] / POSITION_TOLERANCE if differentiate else None
         if task in ("plane", "position"):
             return error, derivative
         if task != "pose":
@@ -154,6 +161,8 @@ class CoefficientIK:
         if torch.any(angle >= torch.pi - 1e-4):
             raise ValueError("The pose residual reaches the rotation-logarithm cut.")
         phi = vee / torch.sinc(angle[:, None] / torch.pi)
+        if not differentiate:
+            return torch.cat((error, phi / ANGULAR_TOLERANCE), -1), None
         skew = torch.zeros_like(relative)
         skew[:, 0, 1], skew[:, 0, 2] = -phi[:, 2], phi[:, 1]
         skew[:, 1, 0], skew[:, 1, 2] = phi[:, 2], -phi[:, 0]
